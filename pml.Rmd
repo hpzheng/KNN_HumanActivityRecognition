@@ -1,0 +1,87 @@
+---
+title: "Prediction of Human Activity Recognition using K-nearest Neighbor (KNN)"
+author: "Heping Zheng"
+date: "December 27, 2015"
+output: html_document
+---
+
+
+```{r}
+library(caret)
+setwd("/Users/dust/Courses/Coursera/ML")
+pml_training <- read.csv("pml-training.csv")
+pml_testing <- read.csv("pml-testing.csv")
+barplot(table(pml_training$classe))
+```
+
+We noticed that the five classes A,B,C,D,E are of similar sample size.
+
+Next, we divided the dataset into 2/3 of training data and 1/3 of testing data which can be used for cross-validation.
+
+
+```{r}
+inTrain <- createDataPartition(y=pml_training$classe, p=0.66, list=FALSE)
+training <- pml_training[inTrain,]
+testing <- pml_training[-inTrain,]
+```
+
+The 2/3 trainng data are then used for building a model for prediction. Primitive feature selection involves manual inspection of the "summary" output of each variables, picking up the first 2 variables that appears to have diversity amongest the dataset: "roll belt" and "pitch belt". K-nearest Neighbor is used for machine learning and prediction using these 2 features (modelFit). The results shows a IN-SAMPLE accuracy of ~75%, with the 95% CI : (0.7457, 0.7606). The OUT-OF-SAMPLE accuracy is ~69%, with 95% CI : (0.6794, 0.7017). This is pretty low. However, considering that only 2 features are used for such a prediction, the result is still quite encouraging.
+
+```{r}
+# belt, arm, dumbbell, forearm
+modelFit <- train(classe~roll_belt+pitch_belt, data=training, method="knn")
+predictions <- predict(modelFit, newdata=training)
+confusionMatrix(predictions, training$classe) # in sample error rate
+predictions <- predict(modelFit, newdata=testing)
+confusionMatrix(predictions, testing$classe) # out of sample error rate
+```
+
+Further feather selection is done by manual inspaection of the "summary" of all 160 variables. Most variables are monotonous and has a lot of empty values, and are not selected as predictors. Some other variables are more complicated and involving X,Y,Z coordinates of movements, these variables are not used too due to complexities. Upon feature selection, I eventually chose only 16 variables to build the complete model, which are roll, pitch, yaw, and total accelaration of belt, arm, dumbbel, and forearm.
+
+The same training dataset used to build the first model is used to build the second model, while the same testing dataset used to cross-validation the first model is also used to cross-validation the second model.
+
+The In-sample error rate is 4.28%, while the In-sample accuracy is 95.72%, and the corresponding 95% CI is (0.9536, 0.9606)
+
+The Out-of-sample error rate is 7.78%, while the Out-of-sample accuracy is 92.22%, and the corresponding 95% CI is (0.9155, 0.9285)
+
+In fact, this is the model (modelFit2) that get 19 out of 20 test cases correct.
+
+```{r}
+modelFit2 <- train(classe~roll_belt+pitch_belt+yaw_belt+total_accel_belt+
+                       roll_arm+pitch_arm+yaw_arm+total_accel_arm+
+                       roll_dumbbell+pitch_dumbbell+yaw_dumbbell+total_accel_dumbbell+
+                       roll_forearm+pitch_forearm+yaw_forearm+total_accel_forearm, data=training, method="knn") # second model with 16 predictors
+predictions <- predict(modelFit2, newdata=training)
+confusionMatrix(predictions, training$classe) # in sample error rate
+predictions <- predict(modelFit2, newdata=testing)
+confusionMatrix(predictions, testing$classe) # out of sample error rate
+```
+
+In case that the second model fails, the third model is a backup solution, I am building a third model as a backup model using 100% of the data, as well as using the user_name as an additional parameter (assuming that different users may have different habit). Although the second model have both in-sample and out-of-sample error rate, the third model will only have an in-sample error rate because only (modelFit3). But I am keen on getting a different answer on the 1 prediction missed by the second model.
+
+```{r}
+modelFit3 <- train(classe~user_name+roll_belt+pitch_belt+yaw_belt+total_accel_belt+
+                       roll_arm+pitch_arm+yaw_arm+total_accel_arm+
+                       roll_dumbbell+pitch_dumbbell+yaw_dumbbell+total_accel_dumbbell+
+                       roll_forearm+pitch_forearm+yaw_forearm+total_accel_forearm, data=pml_training, method="knn")
+predictions <- predict(modelFit3, newdata=training)
+confusionMatrix(predictions, training$classe) # in sample error rate
+predictions <- predict(modelFit3, newdata=testing)
+confusionMatrix(predictions, testing$classe) # out of sample error rate
+```
+
+Finally I am writing out the predictions to the 20 files using the second and the third model. Upon "Prediction Assignment Submission" the second model is able to achieve 95% prediction accuracy on the blind test (19 out od 20), while the third model is able to achieve 100% prediction accuracy (20 out of 20) on the blind test of 20 samples.
+
+```{r}
+predictions <- predict(modelFit2, newdata=pml_testing)
+predictions <- predict(modelFit3, newdata=pml_testing)
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+pml_write_files(predictions)
+```
+

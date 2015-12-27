@@ -1,0 +1,74 @@
+> modelFit2 <- train(classe~roll_belt+pitch_belt+yaw_belt+total_accel_belt+
++                        roll_arm+pitch_arm+yaw_arm+total_accel_arm+
++                        roll_dumbbell+pitch_dumbbell+yaw_dumbbell+total_accel_dumbbell+
++                        roll_forearm+pitch_forearm+yaw_forearm+total_accel_forearm, data=training, method="knn")
+> predictions <- predict(modelFit2, newdata=training)
+> confusionMatrix(predictions, training$classe) # in sample error rate
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    A    B    C    D    E
+         A 3604   41    4    3    4
+         B   45 2362   33   17   20
+         C   11   64 2160   64   24
+         D   17   15   50 2016   34
+         E    6   25   12   23 2299
+
+Overall Statistics
+                                         
+               Accuracy : 0.9605         
+                 95% CI : (0.957, 0.9638)
+    No Information Rate : 0.2843         
+    P-Value [Acc > NIR] : < 2.2e-16      
+                                         
+                  Kappa : 0.95           
+ Mcnemar's Test P-Value : 0.0003879      
+
+Statistics by Class:
+
+                     Class: A Class: B Class: C Class: D Class: E
+Sensitivity            0.9786   0.9422   0.9562   0.9496   0.9656
+Specificity            0.9944   0.9890   0.9848   0.9893   0.9938
+Pos Pred Value         0.9858   0.9536   0.9298   0.9456   0.9721
+Neg Pred Value         0.9915   0.9862   0.9907   0.9901   0.9923
+Prevalence             0.2843   0.1935   0.1744   0.1639   0.1838
+Detection Rate         0.2782   0.1824   0.1668   0.1556   0.1775
+Detection Prevalence   0.2823   0.1912   0.1793   0.1646   0.1826
+Balanced Accuracy      0.9865   0.9656   0.9705   0.9694   0.9797
+> predictions <- predict(modelFit2, newdata=testing)
+> confusionMatrix(predictions, testing$classe) # out of sample error rate
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    A    B    C    D    E
+         A 1807   25    4    3    4
+         B   51 1153   38   13   23
+         C   16   65 1082   64   23
+         D   13   15   31  993   29
+         E   10   32    8   20 1147
+
+Overall Statistics
+                                          
+               Accuracy : 0.927           
+                 95% CI : (0.9205, 0.9331)
+    No Information Rate : 0.2845          
+    P-Value [Acc > NIR] : < 2.2e-16       
+                                          
+                  Kappa : 0.9077          
+ Mcnemar's Test P-Value : 4.886e-08       
+
+Statistics by Class:
+
+                     Class: A Class: B Class: C Class: D Class: E
+Sensitivity            0.9526   0.8938   0.9304   0.9085   0.9356
+Specificity            0.9925   0.9768   0.9695   0.9842   0.9871
+Pos Pred Value         0.9805   0.9022   0.8656   0.9186   0.9425
+Neg Pred Value         0.9814   0.9746   0.9851   0.9821   0.9855
+Prevalence             0.2845   0.1934   0.1744   0.1639   0.1838
+Detection Rate         0.2710   0.1729   0.1622   0.1489   0.1720
+Detection Prevalence   0.2764   0.1916   0.1874   0.1621   0.1825
+Balanced Accuracy      0.9725   0.9353   0.9499   0.9464   0.9614
+> predictions <- predict(modelFit2, newdata=pml_testing)
+> predictions
+ [1] C A B A A E D B A A B C B A E E A B B B
+Levels: A B C D E

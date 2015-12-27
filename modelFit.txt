@@ -1,0 +1,50 @@
+> modelFit <- train(classe~roll_belt+pitch_belt,data=pml_training,method="knn")
+> summary(modelFit)
+            Length Class      Mode     
+learn       2      -none-     list     
+k           1      -none-     numeric  
+theDots     0      -none-     list     
+xNames      2      -none-     character
+problemType 1      -none-     character
+tuneValue   1      data.frame list     
+obsLevels   5      -none-     character
+
+> predictions <- predict(modelFit, newdata=pml_training)
+> confusionMatrix(predictions, pml_training$classe)
+Confusion Matrix and Statistics
+
+          Reference
+Prediction    A    B    C    D    E
+         A 4566  514  450  517  206
+         B  335 2676  242  135  134
+         C  306  379 2313  221  136
+         D  317  144  358 2229   73
+         E   56   84   59  114 3058
+
+Overall Statistics
+                                          
+               Accuracy : 0.7564          
+                 95% CI : (0.7503, 0.7624)
+    No Information Rate : 0.2844          
+    P-Value [Acc > NIR] : < 2.2e-16       
+                                          
+                  Kappa : 0.6905          
+ Mcnemar's Test P-Value : < 2.2e-16       
+
+Statistics by Class:
+
+                     Class: A Class: B Class: C Class: D Class: E
+Sensitivity            0.8183   0.7048   0.6759   0.6931   0.8478
+Specificity            0.8799   0.9465   0.9357   0.9456   0.9805
+Pos Pred Value         0.7302   0.7598   0.6894   0.7142   0.9071
+Neg Pred Value         0.9242   0.9304   0.9318   0.9402   0.9662
+Prevalence             0.2844   0.1935   0.1744   0.1639   0.1838
+Detection Rate         0.2327   0.1364   0.1179   0.1136   0.1558
+Detection Prevalence   0.3187   0.1795   0.1710   0.1591   0.1718
+Balanced Accuracy      0.8491   0.8257   0.8058   0.8194   0.9141
+
+
+> predictions <- predict(modelFit, newdata=pml_testing)
+> predictions
+ [1] B A C D A E B D C A B A C D E E A B B E
+Levels: A B C D E
