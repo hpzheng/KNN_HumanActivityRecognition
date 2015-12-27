@@ -9,7 +9,7 @@ models: contains output of the three models built for the prediction project
 
 predictions: contains the predictions
 
-For gh\_pages, please visit: https://hpzheng.github.io/KNN\_HumanActivityRecognition
+For gh\_pages, please visit: https://hpzheng.github.io/KNN_HumanActivityRecognition
 or click below:
 
 [Visit gh\_pages](https://hpzheng.github.io/KNN_HumanActivityRecognition)
